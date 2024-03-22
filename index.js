@@ -34,5 +34,43 @@ app.get("/appointments", async (req, res) => {
     res.status(500).send(error);
   }
 });
+app.put("/updateAppointmentsStatus/:id", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const appointment = await Appointment.findOne({ id: id });
+
+    if (!appointment) {
+      return res.status(404).send({ error: "Appointment not found" });
+    }
+
+    appointment.status = status;
+    await appointment.save();
+
+    res.status(200).send(appointment);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+app.delete("/deleteAppointment/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await Appointment.deleteOne({ id: id });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).send({ error: "No appointment found to delete" });
+    }
+
+    res.status(200).send({
+      message: `Appointment with ID ${id} deleted successfully`,
+    });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 const port = process.env.PORT || 3001;
 app.listen(port, () => console.log(`Listening on port ${port}`));
