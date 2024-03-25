@@ -34,26 +34,27 @@ app.get("/appointments", async (req, res) => {
     res.status(500).send(error);
   }
 });
-app.put("/updateAppointmentsStatus/:id", async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
+// Update the status of an appointment not needed as we are using the updateAppointmentsData endpoint
+// app.put("/updateAppointmentsStatus/:id", async (req, res) => {
+//   const { id } = req.params;
+//   const { status } = req.body;
 
-  try {
-    const appointment = await Appointment.findOne({ id: id });
+//   try {
+//     const appointment = await Appointment.findOne({ id: id });
 
-    if (!appointment) {
-      return res.status(404).send({ error: "Appointment not found" });
-    }
+//     if (!appointment) {
+//       return res.status(404).send({ error: "Appointment not found" });
+//     }
 
-    appointment.status = status;
-    await appointment.save();
+//     appointment.status = status;
+//     await appointment.save();
 
-    res.status(200).send(appointment);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
+//     res.status(200).send(appointment);
+//   } catch (error) {
+//     res.status(500).send(error);
+//   }
+// });
+// Delete an appointment
 app.delete("/deleteAppointment/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -69,6 +70,24 @@ app.delete("/deleteAppointment/:id", async (req, res) => {
     });
   } catch (error) {
     res.status(500).send(error);
+  }
+});
+// Update appointment details
+app.put("/updateAppointmentsData/:id", async (req, res) => {
+  const { id } = req.params;
+  const update = req.body;
+
+  try {
+    const appointment = await Appointment.findOneAndUpdate({ id: id }, update, {
+      new: true,
+    });
+    if (!appointment) {
+      return res.status(404).send({ message: "Appointment not found" });
+    }
+    res.send(appointment);
+  } catch (error) {
+    console.error(error); // Log the error to the console
+    res.status(500).send({ message: error.message });
   }
 });
 
